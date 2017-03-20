@@ -1,6 +1,8 @@
 Laravel Cassandra
 ===============
 
+[![Build Status](https://scrutinizer-ci.com/g/Fuitad/laravel-cassandra/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Fuitad/laravel-cassandra/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Fuitad/laravel-cassandra/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Fuitad/laravel-cassandra/?branch=master) [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/fuitad)
+
 A Cassandra based Eloquent model and Query builder for Laravel (Casloquent)
 
 **WARNING**: This is a work in progress... not ready for usage yet.

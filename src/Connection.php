@@ -48,42 +48,25 @@ class Connection extends \Illuminate\Database\Connection
         }
 
         $this->useDefaultPostProcessor();
+
+        $this->useDefaultSchemaGrammar();
+
+        $this->setQueryGrammar($this->getDefaultQueryGrammar());
     }
 
     /**
-     * Get the default post processor instance.
-     *
-     * @return Query\Processor
-     */
-    protected function getDefaultPostProcessor()
-    {
-        return new Query\Processor;
-    }
-
-    /**
-     * Begin a fluent query against a database collection.
-     *
-     * @param  string  $collection
-     * @return Query\Builder
-     */
-    public function collection($collection)
-    {
-        $processor = $this->getPostProcessor();
-
-        $query = new Query\Builder($this, $processor);
-
-        return $query->from($collection);
-    }
-
-    /**
-     * Begin a fluent query against a database collection.
+     * Begin a fluent query against a database table.
      *
      * @param  string  $table
      * @return Query\Builder
      */
     public function table($table)
     {
-        return $this->collection($table);
+        $processor = $this->getPostProcessor();
+
+        $query = new Query\Builder($this, $processor);
+
+        return $query->from($table);
     }
 
     /**
@@ -257,6 +240,30 @@ class Connection extends \Illuminate\Database\Connection
 
             return 1;
         });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getDefaultPostProcessor()
+    {
+        return new Query\Processor();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getDefaultQueryGrammar()
+    {
+        return new Query\Grammar();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getDefaultSchemaGrammar()
+    {
+        //return new Schema\Grammar();
     }
 
     /**
