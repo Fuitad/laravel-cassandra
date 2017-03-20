@@ -1,0 +1,35 @@
+{
+    "name": "fuitad/laravel-cassandra",
+    "description": "A Cassandra based Eloquent model and Query builder for Laravel (Casloquent)",
+    "keywords": ["laravel","eloquent","cassandra","csql","database","model","casloquent"],
+    "homepage": "https://github.com/fuitad/laravel-cassandra",
+    "authors": [
+        {
+            "name": "Pierre-Luc Brunet",
+            "homepage": "https://github.com/Fuitad"
+        }
+    ],
+    "license" : "MIT",
+    "require": {
+        "php": ">=5.6.0",
+        "ext-cassandra": ">=1.2.0",
+        "illuminate/support": "^5.1",
+        "illuminate/container": "^5.1",
+        "illuminate/database": "^5.1",
+        "illuminate/events": "^5.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.0|^6.0",
+        "orchestra/testbench": "^3.1",
+        "mockery/mockery": "^0.9",
+        "satooshi/php-coveralls": "^1.0"
+    },
+    "autoload": {
+        "psr-4": { "fuitad\\LaravelCassandra\\" : "src/" }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/TestCase.php"
+        ]
+    }
+}
