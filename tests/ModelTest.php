@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use Cassandra\Timestamp;
 use fuitad\LaravelCassandra\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -40,8 +41,10 @@ class ModelTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $user->created_at);
 
         $raw = $user->getAttributes();
-        $this->assertInstanceOf(ObjectID::class, $raw['id']);
+        $this->assertInstanceOf(Timestamp::class, $raw['created_at']);
+        $this->assertInstanceOf(Timestamp::class, $raw['updated_at']);
 
+        $this->assertEquals(1, $user->id);
         $this->assertEquals('John Doe', $user->name);
         $this->assertEquals(35, $user->age);
     }

@@ -51,6 +51,7 @@ abstract class Model extends BaseModel
 
         return new Timestamp($value->getTimestamp() * 1000);
     }
+
     /**
      * @inheritdoc
      */
