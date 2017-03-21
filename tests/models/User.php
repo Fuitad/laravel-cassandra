@@ -10,6 +10,12 @@ class User extends Casloquent implements AuthenticatableContract, CanResetPasswo
 {
     use Authenticatable, CanResetPassword;
 
+    protected $dates = ['birthday'];
+
     protected static $unguarded = true;
 
+    protected function getDateFormat()
+    {
+        return 'l jS \of F Y h:i:s A';
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace fuitad\LaravelCassandra\Eloquent;
 
+use Carbon\Carbon;
 use Cassandra\Timestamp;
 use fuitad\LaravelCassandra\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Model as BaseModel;
@@ -67,7 +68,7 @@ abstract class Model extends BaseModel
     {
         // Convert UTCDateTime instances.
         if ($value instanceof Timestamp) {
-            return parent::asDateTime($value->toDateTime());
+            return Carbon::instance($value->toDateTime());
         }
 
         return parent::asDateTime($value);

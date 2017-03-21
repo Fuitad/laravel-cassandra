@@ -19,6 +19,35 @@ CREATE TABLE users (
     name        TEXT,
     title       TEXT,
     age         INT,
+    note1       TEXT,
+    note2       TEXT,
+    birthday    TIMESTAMP,
     created_at  TIMESTAMP,
     updated_at  TIMESTAMP,
     PRIMARY KEY ((id)));
+
+
+CREATE TABLE soft (
+    id          INT,
+    name        TEXT,
+    created_at  TIMESTAMP,
+    updated_at  TIMESTAMP,
+    deleted_at  TIMESTAMP,
+    PRIMARY KEY ((id), deleted_at));
+
+
+CREATE TABLE books (
+    title        TEXT,
+    author       TEXT,
+    created_at  TIMESTAMP,
+    updated_at  TIMESTAMP,
+    PRIMARY KEY ((title)));
+
+
+CREATE TABLE items (
+    id          INT,
+    name        TEXT,
+    type        TEXT,
+    created_at  TIMESTAMP,
+    updated_at  TIMESTAMP,
+    PRIMARY KEY ((id), name));
