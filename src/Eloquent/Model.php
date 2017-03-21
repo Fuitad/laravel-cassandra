@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 abstract class Model extends BaseModel
 {
     /**
+     * Indicates if the IDs are auto-incrementing.
+     * This is not possible in cassandra so we override this
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
      * @inheritdoc
      */
     public function newEloquentBuilder($query)
@@ -82,6 +90,18 @@ abstract class Model extends BaseModel
         }
 
         return parent::originalIsNumericallyEquivalent($key);
+    }
+
+    /**
+     * Get the table qualified key name.
+     * Cassandra does not support the table.column annotation so
+     * we override this
+     *
+     * @return string
+     */
+    public function getQualifiedKeyName()
+    {
+        return $this->getKeyName();
     }
 
     /**

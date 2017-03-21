@@ -52,13 +52,14 @@ class ModelTest extends TestCase
     public function testUpdate()
     {
         $user = new User;
+        $user->id = 1;
         $user->name = 'John Doe';
         $user->title = 'admin';
         $user->age = 35;
         $user->save();
 
         $raw = $user->getAttributes();
-        $this->assertInstanceOf(ObjectID::class, $raw['id']);
+        $this->assertEquals(1, $user->id);
 
         $check = User::find($user->id);
 
@@ -76,39 +77,10 @@ class ModelTest extends TestCase
         $user->update(['age' => 20]);
 
         $raw = $user->getAttributes();
-        $this->assertInstanceOf(ObjectID::class, $raw['id']);
+        $this->assertEquals(1, $user->id);
 
         $check = User::find($user->id);
         $this->assertEquals(20, $check->age);
-    }
-
-    public function testManualStringId()
-    {
-        $user = new User;
-        $user->id = '4af9f23d8ead0e1d32000000';
-        $user->name = 'John Doe';
-        $user->title = 'admin';
-        $user->age = 35;
-        $user->save();
-
-        $this->assertEquals(true, $user->exists);
-        $this->assertEquals('4af9f23d8ead0e1d32000000', $user->id);
-
-        $raw = $user->getAttributes();
-        $this->assertInstanceOf(ObjectID::class, $raw['id']);
-
-        $user = new User;
-        $user->id = 'customId';
-        $user->name = 'John Doe';
-        $user->title = 'admin';
-        $user->age = 35;
-        $user->save();
-
-        $this->assertEquals(true, $user->exists);
-        $this->assertEquals('customId', $user->id);
-
-        $raw = $user->getAttributes();
-        $this->assertInternalType('string', $raw['id']);
     }
 
     public function testManualIntId()
@@ -124,12 +96,13 @@ class ModelTest extends TestCase
         $this->assertEquals(1, $user->id);
 
         $raw = $user->getAttributes();
-        $this->assertInternalType('integer', $raw['id']);
+        $this->assertEquals(1, $user->id);
     }
 
     public function testDelete()
     {
         $user = new User;
+        $user->id = 1;
         $user->name = 'John Doe';
         $user->title = 'admin';
         $user->age = 35;
@@ -146,12 +119,14 @@ class ModelTest extends TestCase
     public function testAll()
     {
         $user = new User;
+        $user->id = 1;
         $user->name = 'John Doe';
         $user->title = 'admin';
         $user->age = 35;
         $user->save();
 
         $user = new User;
+        $user->id = 2;
         $user->name = 'Jane Doe';
         $user->title = 'user';
         $user->age = 32;
@@ -167,6 +142,7 @@ class ModelTest extends TestCase
     public function testFind()
     {
         $user = new User;
+        $user->id = 1;
         $user->name = 'John Doe';
         $user->title = 'admin';
         $user->age = 35;
@@ -185,8 +161,8 @@ class ModelTest extends TestCase
     public function testGet()
     {
         User::insert([
-            ['name' => 'John Doe'],
-            ['name' => 'Jane Doe'],
+            ['id' => 1, 'name' => 'John Doe'],
+            ['id' => 2, 'name' => 'Jane Doe'],
         ]);
 
         $users = User::get();
@@ -195,11 +171,34 @@ class ModelTest extends TestCase
         $this->assertInstanceOf(Model::class, $users[0]);
     }
 
+    public function testBulkInsert()
+    {
+        User::insert([
+            ['id' => 1, 'name' => 'John Doe'],
+            ['id' => 2, 'name' => 'Jane Doe'],
+        ]);
+
+        $users = User::get();
+        $this->assertEquals(2, count($users));
+
+        $johnDoe = User::find(1);
+
+        $this->assertEquals(true, $johnDoe->exists);
+        $this->assertEquals('John Doe', $johnDoe->name);
+        $this->assertEquals(1, $johnDoe->id);
+
+        $janeDoe = User::find(2);
+
+        $this->assertEquals(true, $janeDoe->exists);
+        $this->assertEquals('Jane Doe', $janeDoe->name);
+        $this->assertEquals(2, $janeDoe->id);
+    }
+
     public function testFirst()
     {
         User::insert([
-            ['name' => 'John Doe'],
-            ['name' => 'Jane Doe'],
+            ['id' => 1, 'name' => 'John Doe'],
+            ['id' => 2, 'name' => 'Jane Doe'],
         ]);
 
         $user = User::first();
@@ -209,38 +208,39 @@ class ModelTest extends TestCase
 
     public function testNoDocument()
     {
-        $items = Item::where('name', 'nothing')->get();
-        $this->assertInstanceOf(Collection::class, $items);
-        $this->assertEquals(0, $items->count());
+        $users = User::where('id', 999)->get();
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertEquals(0, $users->count());
 
-        $item = Item::where('name', 'nothing')->first();
-        $this->assertEquals(null, $item);
+        $user = User::where('id', 999)->first();
+        $this->assertEquals(null, $user);
 
-        $item = Item::find('51c33d8981fec6813e00000a');
-        $this->assertEquals(null, $item);
+        $user = User::find(999);
+        $this->assertEquals(null, $user);
     }
 
     public function testFindOrfail()
     {
         $this->expectException(Illuminate\Database\Eloquent\ModelNotFoundException::class);
-        User::findOrfail('51c33d8981fec6813e00000a');
+        User::findOrfail(999);
     }
 
     public function testCreate()
     {
-        $user = User::create(['name' => 'Jane Poe']);
+        $user = User::create(['id' => 1, 'name' => 'Jane Poe']);
 
         $this->assertInstanceOf(Model::class, $user);
         $this->assertEquals(true, $user->exists);
         $this->assertEquals('Jane Poe', $user->name);
 
-        $check = User::where('name', 'Jane Poe')->first();
+        $check = User::where('id', 1)->first();
         $this->assertEquals($user->id, $check->id);
     }
 
     public function testDestroy()
     {
         $user = new User;
+        $user->id = 1;
         $user->name = 'John Doe';
         $user->title = 'admin';
         $user->age = 35;
@@ -254,6 +254,7 @@ class ModelTest extends TestCase
     public function testTouch()
     {
         $user = new User;
+        $user->id = 1;
         $user->name = 'John Doe';
         $user->title = 'admin';
         $user->age = 35;

@@ -3,6 +3,8 @@
 namespace fuitad\LaravelCassandra;
 
 use Cassandra;
+use Cassandra\BatchStatement;
+use Cassandra\ExecutionOptions;
 
 class Connection extends \Illuminate\Database\Connection
 {
@@ -192,9 +194,46 @@ class Connection extends \Illuminate\Database\Connection
                 return [];
             }
 
-            $statement = $this->session->prepare($query);
+            $preparedStatement = $this->session->prepare($query);
 
-            return $this->session->execute($statement, new \Cassandra\ExecutionOptions(['arguments' => $bindings]));
+            return $this->session->execute($preparedStatement, new ExecutionOptions(['arguments' => $bindings]));
+        });
+    }
+
+    /**
+     * Run an bulk insert statement against the database.
+     *
+     * @param  array  $queries
+     * @param  array  $bindings
+     * @return bool
+     */
+    public function insertBulk($queries, $bindings = [], $type = Cassandra::BATCH_LOGGED)
+    {
+        return $this->batchStatement($queries, $bindings, $type);
+    }
+
+    /**
+     * Execute a group of queries inside a batch statement against the database.
+     *
+     * @param  array  $queries
+     * @param  array  $bindings
+     * @return bool
+     */
+    public function batchStatement($queries = [], $bindings = [], $type = Cassandra::BATCH_LOGGED)
+    {
+        return $this->run($queries, $bindings, function ($queries, $bindings) {
+            if ($this->pretending()) {
+                return [];
+            }
+
+            $batch = new BatchStatement(Cassandra::BATCH_LOGGED);
+
+            foreach ($queries as $k => $query) {
+                $preparedStatement = $this->session->prepare($query);
+                $batch->add($preparedStatement, $bindings[$k]);
+            }
+
+            return $this->session->execute($batch);
         });
     }
 
@@ -212,9 +251,9 @@ class Connection extends \Illuminate\Database\Connection
                 return [];
             }
 
-            $statement = $this->session->prepare($query);
+            $preparedStatement = $this->session->prepare($query);
 
-            return $this->session->execute($statement, new \Cassandra\ExecutionOptions(['arguments' => $bindings]));
+            return $this->session->execute($preparedStatement, new ExecutionOptions(['arguments' => $bindings]));
         });
     }
 
@@ -234,9 +273,9 @@ class Connection extends \Illuminate\Database\Connection
                 return 0;
             }
 
-            $statement = $this->session->prepare($query);
+            $preparedStatement = $this->session->prepare($query);
 
-            $this->session->execute($statement, new \Cassandra\ExecutionOptions(['arguments' => $bindings]));
+            $this->session->execute($preparedStatement, new ExecutionOptions(['arguments' => $bindings]));
 
             return 1;
         });
