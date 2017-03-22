@@ -36,8 +36,6 @@ class ModelTest extends TestCase
         $this->assertEquals(1, User::count());
 
         $this->assertTrue(isset($user->id));
-        $this->assertNotEquals('', (string) $user->id);
-        $this->assertNotEquals(0, strlen((string) $user->id));
         $this->assertInstanceOf(Carbon::class, $user->created_at);
 
         $raw = $user->getAttributes();

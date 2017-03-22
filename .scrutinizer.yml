@@ -134,11 +134,14 @@ build:
             - sudo easy_install pip
             - pip install cqlsh
             - /usr/bin/cqlsh -f /home/scrutinizer/build/setup_cassandra_unittest_keyspace.cql
-            
+
         override:
             - yes | pecl install cassandra-1.2.2
-            - composer install --no-interaction
-
+            - cd /home/scrutinizer/build/ && composer install --no-interaction
+        
+        cache:
+            directories:
+                - ~/.cache/pip
     tests:
         override:
             -
