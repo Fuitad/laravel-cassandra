@@ -18,6 +18,8 @@ echo "deb-src http://www.apache.org/dist/cassandra/debian 30x main" | sudo tee -
 curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
 sudo apt-get update && sudo apt-get install -y cassandra
 
+sudo service cassandra start
+
 cd /tmp && git clone https://github.com/datastax/cpp-driver.git && cd cpp-driver && git checkout 76656844bd13be1dbccbdb69dad93c2e9514e21f `#Version 2.6.0` && mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr .. && make && sudo make install
 
 pecl install cassandra-1.2.2
