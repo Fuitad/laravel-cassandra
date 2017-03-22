@@ -2,7 +2,7 @@ DROP KEYSPACE IF EXISTS unittest;
 
 CREATE KEYSPACE unittest WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 
-use unittest;
+USE unittest;
 
 CREATE TABLE testtable (
     id      INT,
