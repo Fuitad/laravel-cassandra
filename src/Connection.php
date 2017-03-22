@@ -72,16 +72,6 @@ class Connection extends \Illuminate\Database\Connection
     }
 
     /**
-     * Get a schema builder instance for the connection.
-     *
-     * @return Schema\Builder
-     */
-    public function getSchemaBuilder()
-    {
-        return new Schema\Builder($this);
-    }
-
-    /**
      * return Cassandra cluster.
      *
      * @return \Cassandra\Cluster
@@ -207,7 +197,7 @@ class Connection extends \Illuminate\Database\Connection
      * @param  array  $bindings
      * @return bool
      */
-    public function insertBulk($queries, $bindings = [], $type = Cassandra::BATCH_LOGGED)
+    public function insertBulk($queries = [], $bindings = [], $type = Cassandra::BATCH_LOGGED)
     {
         return $this->batchStatement($queries, $bindings, $type);
     }
