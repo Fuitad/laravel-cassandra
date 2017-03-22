@@ -1,9 +1,9 @@
 language: php
 
 php:
-  - 5.6
   - 7
-  - 7.1
+
+sudo: required
 
 matrix:
   fast_finish: true
@@ -12,9 +12,6 @@ addons:
   apt:
     packages:
       - oracle-java8-set-default
-
-services:
-  - cassandra
 
 before_script:
   - sudo apt-get install -y g++ make cmake libuv-dev libssl-dev libgmp-dev php5 php5-dev openssl libpcre3-dev python-setuptools python-dev build-essential 
@@ -26,7 +23,6 @@ before_script:
   - sudo easy_install pip
   - pip install cqlsh
   - /usr/bin/cqlsh -f /home/scrutinizer/build/setup_cassandra_unittest_keyspace.cql
-
   - pecl install cassandra-1.2.2
   - travis_retry composer self-update
   - travis_retry composer install --no-interaction
@@ -37,3 +33,10 @@ script:
 
 after_success:
   - sh -c 'php vendor/bin/coveralls -v'
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log    
