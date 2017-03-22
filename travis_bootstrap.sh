@@ -11,6 +11,8 @@ sudo make install
 sudo rm -rf /usr/local/src/libuv-1.8.0 && cd ~/
 sudo ldconfig
 
+sudo service cassandra stop
+sudo rm -rf /var/lib/cassandra/* /etc/init.d/cassandra
 echo "deb http://www.apache.org/dist/cassandra/debian 30x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
 echo "deb-src http://www.apache.org/dist/cassandra/debian 30x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
 curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
