@@ -44,10 +44,18 @@ CREATE TABLE books (
     PRIMARY KEY ((title)));
 
 
+CREATE TYPE stats (
+   name TEXT,
+   value INT
+);
+
+
 CREATE TABLE items (
     id          INT,
     name        TEXT,
     type        TEXT,
+    stats       FROZEN<stats>,
     created_at  TIMESTAMP,
     updated_at  TIMESTAMP,
     PRIMARY KEY ((id), name));
+
