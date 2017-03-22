@@ -139,9 +139,9 @@ build:
             - yes | pecl install cassandra-1.2.2
             - cd /home/scrutinizer/build/ && composer install --no-interaction
         
-        cache:
-            directories:
-                - ~/.cache/pip
+    cache:
+        directories:
+            - ~/.cache/pip
     tests:
         override:
             -
