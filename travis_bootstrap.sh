@@ -23,6 +23,6 @@ cd /tmp && git clone https://github.com/datastax/cpp-driver.git && cd cpp-driver
 pecl install cassandra-1.2.2
 
 sudo easy_install pip
-pip install cqlsh
+sudo pip install cqlsh
 
 /usr/bin/cqlsh -f $HOME/setup_cassandra_unittest_keyspace.cql
