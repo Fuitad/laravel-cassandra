@@ -113,7 +113,7 @@ coding_style:
 build:
     environment:
         php:
-            version: '7.0'
+            version: '5.6'
         java: java-8-oracle
         postgresql: false
         mongodb: false
