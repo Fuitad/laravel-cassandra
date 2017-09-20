@@ -267,6 +267,11 @@ class Connection extends \Illuminate\Database\Connection
                 return 0;
             }
 
+            // Really hacky but Eloquent Builder add  ( ) to where on request with more than one filter.
+            // preg_replace change "...where ( ... )" to "...where ...".
+            $query = preg_replace('~(.*)where \(([^\)]*)\)(.*)$~', '${1}where ${2}', $query);
+            $query = preg_replace('~(.*)where \(([^\)]*)\)(.*)( limit [0-9]*)$~', '${1}where ${2}${3}', $query);
+
             $preparedStatement = $this->session->prepare($query);
 
             $this->session->execute($preparedStatement, new ExecutionOptions(['arguments' => $bindings]));
