@@ -11,9 +11,13 @@ class Builder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function __construct(Connection $connection, Processor $processor)
+    public function __construct(Connection $connection, Grammar $grammar = null, Processor $processor)
     {
-        $this->grammar = new Grammar;
+        if (is_null($grammar)) {
+            $this->grammar = new Grammar;
+        } else {
+            $this->grammar = $grammar;
+        }
         $this->connection = $connection;
         $this->processor = $processor;
     }

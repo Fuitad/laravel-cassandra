@@ -1,5 +1,5 @@
 {
-    "name": "fuitad/laravel-cassandra",
+    "name": "dbyzero/laravel-cassandra",
     "description": "A Cassandra based Eloquent model and Query builder for Laravel (Casloquent)",
     "keywords": ["laravel","eloquent","cassandra","csql","database","model","casloquent"],
     "homepage": "https://github.com/fuitad/laravel-cassandra",
@@ -7,6 +7,10 @@
         {
             "name": "Pierre-Luc Brunet",
             "homepage": "https://github.com/Fuitad"
+        },
+        {
+            "name": "Cyril ALFARO",
+            "homepage": "https://github.com/dbyzero"
         }
     ],
     "license" : "MIT",
