@@ -184,6 +184,9 @@ class Connection extends \Illuminate\Database\Connection
                 return [];
             }
 
+            // Really hacky but Eloquent Builder add  ( ) to where on request with more than one filter.
+            // preg_replace change "...where ( ... )" to "...where ...".
+            $query = preg_replace('~(.*)where \(([^\)]*)\)$~', '${1}where ${2}', $query);
             $preparedStatement = $this->session->prepare($query);
 
             return $this->session->execute($preparedStatement, new ExecutionOptions(['arguments' => $bindings]));
