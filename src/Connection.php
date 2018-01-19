@@ -4,7 +4,6 @@ namespace fuitad\LaravelCassandra;
 
 use Cassandra;
 use Cassandra\BatchStatement;
-use Cassandra\ExecutionOptions;
 
 class Connection extends \Illuminate\Database\Connection
 {
@@ -141,7 +140,7 @@ class Connection extends \Illuminate\Database\Connection
                 $contactPoints = $options['contactpoints'];
             }
 
-            $cluster->withContactPoints($contactPoints);
+            call_user_func_array([$cluster, 'withContactPoints'], $contactPoints);
         }
 
         if (!isset($options['port']) && !empty($config['port'])) {
@@ -186,7 +185,7 @@ class Connection extends \Illuminate\Database\Connection
 
             $preparedStatement = $this->session->prepare($query);
 
-            return $this->session->execute($preparedStatement, new ExecutionOptions(['arguments' => $bindings]));
+            return $this->session->execute($preparedStatement, ['arguments' => $bindings]);
         });
     }
 
@@ -243,7 +242,7 @@ class Connection extends \Illuminate\Database\Connection
 
             $preparedStatement = $this->session->prepare($query);
 
-            return $this->session->execute($preparedStatement, new ExecutionOptions(['arguments' => $bindings]));
+            return $this->session->execute($preparedStatement, ['arguments' => $bindings]);
         });
     }
 
@@ -265,7 +264,7 @@ class Connection extends \Illuminate\Database\Connection
 
             $preparedStatement = $this->session->prepare($query);
 
-            $this->session->execute($preparedStatement, new ExecutionOptions(['arguments' => $bindings]));
+            $this->session->execute($preparedStatement, ['arguments' => $bindings]);
 
             return 1;
         });
