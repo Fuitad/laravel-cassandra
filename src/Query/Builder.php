@@ -19,6 +19,15 @@ class Builder extends BaseBuilder
     }
 
     /**
+     * Support "allow filtering"
+     */
+    public function allowFiltering($bool = true) {
+        $this->allowFiltering = (bool) $bool;
+
+        return $this;
+    }
+
+    /**
      * Insert a new record into the database.
      *
      * @param  array  $values
