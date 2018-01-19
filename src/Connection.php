@@ -43,9 +43,9 @@ class Connection extends \Illuminate\Database\Connection
         // Create the connection
         $this->cluster = $this->createCluster(null, $config, $options);
 
-        if (isset($options['keyspace']) || isset($config['keyspace'])) {
-            $this->keyspace = $config['keyspace'];
-            $this->session = $this->cluster->connect($config['keyspace']);
+        if (isset($options['database']) || isset($config['database'])) {
+            $this->keyspace = $config['database'];
+            $this->session = $this->cluster->connect($config['database']);
         }
 
         $this->useDefaultPostProcessor();
