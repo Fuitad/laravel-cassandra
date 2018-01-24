@@ -8,6 +8,8 @@ use Illuminate\Support\Arr;
 
 class Builder extends BaseBuilder
 {
+    public $allowFiltering = false;
+
     /**
      * @inheritdoc
      */
