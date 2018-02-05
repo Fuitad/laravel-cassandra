@@ -18,8 +18,8 @@ class Grammar extends BaseGrammar
         'wheres',
         'orders',
         'limit',
-        'allowFiltering',
         'groups',
+        'allowFiltering'
     ];
 
     public function compileAllowFiltering(Builder $query, $bool)

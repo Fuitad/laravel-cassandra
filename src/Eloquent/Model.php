@@ -32,7 +32,7 @@ abstract class Model extends BaseModel
     {
         $connection = $this->getConnection();
 
-        return new QueryBuilder($connection, $connection->getPostProcessor());
+        return new QueryBuilder($connection, null, $connection->getPostProcessor());
     }
 
     /**

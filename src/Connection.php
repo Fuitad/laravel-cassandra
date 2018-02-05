@@ -65,7 +65,7 @@ class Connection extends \Illuminate\Database\Connection
     {
         $processor = $this->getPostProcessor();
 
-        $query = new Query\Builder($this, $processor);
+        $query = new Query\Builder($this, null, $processor);
 
         return $query->from($table);
     }
