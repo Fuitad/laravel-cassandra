@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Cassandra\Timestamp;
 use fuitad\LaravelCassandra\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Model as BaseModel;
+use Illuminate\Support\Str;
 
 abstract class Model extends BaseModel
 {
