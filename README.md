@@ -14,7 +14,7 @@ Installation
 
  Laravel  | Package
 :---------|:----------
- 5.4.x    | dev-master
+ 5.4.x - 5.5.x   | dev-master
 
 Make sure you have the Cassandra PHP driver installed (version 1.2+). You can find more information at http://datastax.github.io/php-driver/.
 
@@ -23,14 +23,12 @@ Installation using composer:
 ```
 composer require fuitad/laravel-cassandra
 ```
-
+#### Laravel
 And add the service provider in `config/app.php`:
 
 ```php
 fuitad\LaravelCassandra\CassandraServiceProvider::class,
 ```
-
-(haven't tested with Lumen yet... TODO)
 
 The service provider will register a cassandra database extension with the original database manager. There is no need to register additional facades or objects. When using cassandra connections, Laravel will automatically provide you with the corresponding cassandra objects.
 
@@ -41,6 +39,17 @@ $capsule->getDatabaseManager()->extend('cassandra', function($config)
 {
     return new fuitad\LaravelCassandra\Connection($config);
 });
+```
+#### Lumen
+
+Add next lines to your `bootstrap.php`
+
+```php
+    $app->configure('database');
+```
+
+```php
+    $app->register(fuitad\LaravelCassandra\CassandraServiceProvider::class);
 ```
 
 Configuration
@@ -58,7 +67,7 @@ And add a new cassandra connection:
 'cassandra' => [
     'driver'   => 'cassandra',
     'host'     => env('DB_HOST', 'localhost'),
-    'port'     => env('DB_PORT', 9142),
+    'port'     => env('DB_PORT', 9042),
     'keyspace' => env('DB_DATABASE'),
     'username' => env('DB_USERNAME'),
     'password' => env('DB_PASSWORD'),
@@ -71,7 +80,7 @@ You can connect to multiple servers with the following configuration:
 'cassandra' => [
     'driver'   => 'cassandra',
     'host'     => ['server1', 'server2'],
-    'port'     => env('DB_PORT', 9142),
+    'port'     => env('DB_PORT', 9042),
     'keyspace' => env('DB_DATABASE'),
     'username' => env('DB_USERNAME'),
     'password' => env('DB_PASSWORD'),
@@ -81,8 +90,22 @@ You can connect to multiple servers with the following configuration:
 
 Eloquent
 --------
+Supported most of eloquent query build features, events, fields access.
 
-TODO
+```php
+    $users = User::all();
+    
+    $user = User::where('email', 'tester@test.com')->first();
+    
+    $user = User::find(new \Cassandra\Uuid("7e4c27e2-1991-11e8-accf-0ed5f89f718b"))
+```
+
+TODO:
+- full support composite primary key
+- add ability to work with views
+- full test coverage
+
+Relations - NOT SUPPORTED
 
 Query Builder
 -------------
