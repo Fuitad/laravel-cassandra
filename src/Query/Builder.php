@@ -69,5 +69,38 @@ class Builder extends BaseBuilder
             return $this->connection->insertBulk($queries, $bindings);
         }
     }
+    
+    
+    /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Support\Collection
+     */
+    public function get($columns = ['*'])
+    {
+        $original = $this->columns;
+
+        if (is_null($original)) {
+            $this->columns = $columns;
+        }
+
+        $results = $this->processor->processSelect($this, $this->runSelect());
+
+        $collection = [];
+        while (true) {
+            $collection = array_merge($collection, collect($results)->toArray());
+            if ($results->isLastPage()) {
+                break;
+            }
+
+            $results = $results->nextPage();
+        }
+
+        $this->columns = $original;
+
+        return collect($collection);
+    }
+
 
 }
