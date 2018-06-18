@@ -65,12 +65,13 @@ And add a new cassandra connection:
 
 ```php
 'cassandra' => [
-    'driver'   => 'cassandra',
-    'host'     => env('DB_HOST', 'localhost'),
-    'port'     => env('DB_PORT', 9042),
-    'keyspace' => env('DB_DATABASE'),
-    'username' => env('DB_USERNAME'),
-    'password' => env('DB_PASSWORD'),
+    'driver'    => 'cassandra',
+    'host'      => env('DB_HOST', 'localhost'),
+    'port'      => env('DB_PORT', 9042),
+    'keyspace'  => env('DB_DATABASE'),
+    'username'  => env('DB_USERNAME'),
+    'password'  => env('DB_PASSWORD'),
+    'page_size' => env('DB_PAGE_SIZE', 5000),
 ],
 ```
 
@@ -78,12 +79,13 @@ You can connect to multiple servers with the following configuration:
 
 ```php
 'cassandra' => [
-    'driver'   => 'cassandra',
-    'host'     => ['server1', 'server2'],
-    'port'     => env('DB_PORT', 9042),
-    'keyspace' => env('DB_DATABASE'),
-    'username' => env('DB_USERNAME'),
-    'password' => env('DB_PASSWORD'),
+    'driver'    => 'cassandra',
+    'host'      => ['server1', 'server2'],
+    'port'      => env('DB_PORT', 9042),
+    'keyspace'  => env('DB_DATABASE'),
+    'username'  => env('DB_USERNAME'),
+    'password'  => env('DB_PASSWORD'),
+    'page_size' => env('DB_PAGE_SIZE', 5000),
 ],
 ```
 
