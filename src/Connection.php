@@ -7,6 +7,8 @@ use Cassandra\BatchStatement;
 
 class Connection extends \Illuminate\Database\Connection
 {
+    const DEFAULT_PAGE_SIZE = 5000;
+    
     /**
      * The Cassandra keyspace
      *
@@ -36,7 +38,10 @@ class Connection extends \Illuminate\Database\Connection
     public function __construct(array $config)
     {
         $this->config = $config;
-
+        if (empty($this->config['page_size'])) {
+            $this->config['page_size'] = self::DEFAULT_PAGE_SIZE;
+        }
+        
         // You can pass options directly to the Cassandra constructor
         $options = array_get($config, 'options', []);
 
@@ -185,7 +190,7 @@ class Connection extends \Illuminate\Database\Connection
 
             $preparedStatement = $this->session->prepare($query);
 
-            return $this->session->execute($preparedStatement, ['arguments' => $bindings]);
+            return $this->session->execute($preparedStatement, ['arguments' => $bindings, 'page_size' => $this->config['page_size']]);
         });
     }
 
