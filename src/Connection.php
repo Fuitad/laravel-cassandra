@@ -190,7 +190,7 @@ class Connection extends \Illuminate\Database\Connection
 
             $preparedStatement = $this->session->prepare($query);
 
-            return $this->session->execute($preparedStatement, ['arguments' => $bindings, 'page_size' => $this->config['page_size']]);
+            return $this->session->execute($preparedStatement, ['arguments' => $bindings, 'page_size' => (int)$this->config['page_size']]);
         });
     }
 
