@@ -2,6 +2,7 @@
 
 namespace fuitad\LaravelCassandra\Query;
 
+use fuitad\LaravelCassandra\Collection;
 use fuitad\LaravelCassandra\Connection;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Support\Arr;
@@ -70,14 +71,16 @@ class Builder extends BaseBuilder
         }
     }
     
-    
     /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
+     * @param  int|null  $length
+     * @param  string|null  $nextPageToken
+     *
      * @return \Illuminate\Support\Collection
      */
-    public function get($columns = ['*'])
+    public function get($columns = ['*'], $length = null, $nextPageToken = null)
     {
         $original = $this->columns;
 
@@ -85,7 +88,15 @@ class Builder extends BaseBuilder
             $this->columns = $columns;
         }
 
-        $results = $this->processor->processSelect($this, $this->runSelect());
+        $options = [];
+        if ($length !== null && (int)$length > 0) {
+            $options['page_size'] = (int) $length;
+        }
+        if ($nextPageToken !== null) {
+            $options['paging_state_token'] = $nextPageToken;
+        }
+
+        $results = $this->processor->processSelect($this, $this->runSelect($options));
 
         $collection = [];
         while (true) {
@@ -102,5 +113,39 @@ class Builder extends BaseBuilder
         return collect($collection);
     }
 
+    /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  int|null  $length
+     * @param  string|null  $nextPageToken
+     *
+     * @return Collection
+     */
+    public function getPage($length = null, $nextPageToken = null)
+    {
+        $options = [];
+        if ($length !== null && (int)$length > 0) {
+            $options['page_size'] = (int) $length;
+        }
+        if ($nextPageToken !== null) {
+            $options['paging_state_token'] = $nextPageToken;
+        }
+
+        $results = $this->processor->processSelect($this, $this->runSelect($options));
+
+        return new Collection($results);
+    }
+
+    /**
+     * Run the query as a "select" statement against the connection.
+     *
+     * @return array
+     */
+    protected function runSelect($options = [])
+    {
+        return $this->connection->select(
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $options
+        );
+    }
 
 }

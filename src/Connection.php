@@ -31,6 +31,13 @@ class Connection extends \Illuminate\Database\Connection
     protected $session;
 
     /**
+     * The config
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
      * Create a new database connection instance.
      *
      * @param  array   $config
@@ -181,16 +188,25 @@ class Connection extends \Illuminate\Database\Connection
      * @param  bool  $useReadPdo
      * @return array
      */
-    public function select($query, $bindings = [], $useReadPdo = true)
+    public function select($query, $bindings = [], $useReadPdo = true, $customOptions = [])
     {
-        return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
+        return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo, $customOptions) {
             if ($this->pretending()) {
                 return [];
             }
 
             $preparedStatement = $this->session->prepare($query);
 
-            return $this->session->execute($preparedStatement, ['arguments' => $bindings, 'page_size' => (int)$this->config['page_size']]);
+            //Set default page size
+            $defaultOptions = ['page_size' => (int)$this->config['page_size']];
+
+            //Merge with custom options
+            $options = array_merge($defaultOptions, $customOptions);
+
+            //Add bindings
+            $options['arguments'] = $bindings;
+
+            return $this->session->execute($preparedStatement, $options);
         });
     }
 
