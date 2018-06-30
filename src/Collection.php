@@ -2,6 +2,7 @@
 
 namespace fuitad\LaravelCassandra;
 
+use Cassandra\Rows;
 use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Arrayable;
@@ -18,16 +19,45 @@ class Collection extends BaseCollection implements QueueableCollection
     private $rows;
 
     /**
+     * Items model
+     *
+     * @var Model
+     */
+    private $model;
+
+    /**
      * Create a new collection.
      *
-     * @param  mixed  $items
+     * @param  mixed  $rows
      * @return void
      */
-    public function __construct(\Cassandra\Rows $items)
+    public function __construct(\Cassandra\Rows $rows, Model $model = null)
     {
-        parent::__construct($items);
+        $this->rows = $rows;
+        $this->model = $model;
 
-        $this->rows = $items;
+
+        parent::__construct($this->prepareItems());
+    }
+
+    /**
+     * Prepare items for collection
+     *
+     * @return Rows|Model[]
+     */
+    protected function prepareItems()
+    {
+        if ($this->model !== null) {
+            $models = [];
+
+            foreach ($this->rows as $row) {
+                $models[] = $this->model->newFromBuilder($row);
+            }
+
+            return $models;
+        } else {
+            return $this->rows;
+        }
     }
 
     /**
@@ -35,7 +65,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return mixed
      */
-    public function getPagingStateToken()
+    public function getNextPageToken()
     {
         return $this->rows->pagingStateToken();
     }
@@ -57,7 +87,7 @@ class Collection extends BaseCollection implements QueueableCollection
     public function nextPage()
     {
         if (!$this->isLastPage()) {
-            return new Collection($this->rows->nextPage());
+            return new Collection($this->rows->nextPage(), $this->model);
         }
     }
 
@@ -83,7 +113,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         if ($nextPage) {
             $this->items = array_merge($this->items, $nextPage->toArray());
-            $this->rows = $this->getRows();
+            $this->rows = $nextPage->getRows();
         }
 
         return $this;
@@ -138,6 +168,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * @param  mixed  $key
      * @param  mixed  $operator
      * @param  mixed  $value
+     *
      * @return bool
      */
     public function contains($key, $operator = null, $value = null)

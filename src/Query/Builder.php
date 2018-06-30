@@ -103,19 +103,18 @@ class Builder extends BaseBuilder
         $results = $this->processor->processSelect($this, $this->runSelect($options));
 
         // Get results from all pages
-        $collection = [];
-        while (true) {
-            $collection = array_merge($collection, collect($results)->toArray());
-            if ($results->isLastPage()) {
-                break;
-            }
+        $collection = new Collection($results);
 
-            $results = $results->nextPage();
-        }
+//TODO:
+//        if (something) {
+            while (!$collection->isLastPage()) {
+                $collection = $collection->appendNextPage();
+            }
+//        }
 
         $this->columns = $original;
 
-        return collect($collection);
+        return $collection;
     }
 
     /**
@@ -124,7 +123,7 @@ class Builder extends BaseBuilder
      * @param  int|null  $pageSize
      * @param  string|null  $nextPageToken
      *
-     * @return Collection
+     * @return \Cassandra\Rows
      *
      * @TODO implement skip / offset
      */
@@ -140,7 +139,7 @@ class Builder extends BaseBuilder
 
         $results = $this->processor->processSelect($this, $this->runSelect($options));
 
-        return new Collection($results);
+        return $results;
     }
 
     /**
