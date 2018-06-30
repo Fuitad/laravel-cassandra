@@ -75,12 +75,14 @@ class Builder extends BaseBuilder
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
-     * @param  int|null  $length
+     * @param  int|null  $pageSize
      * @param  string|null  $nextPageToken
      *
      * @return \Illuminate\Support\Collection
+     *
+     * @TODO implement skip / offset
      */
-    public function get($columns = ['*'], $length = null, $nextPageToken = null)
+    public function get($columns = ['*'], $pageSize = null, $nextPageToken = null)
     {
         $original = $this->columns;
 
@@ -88,16 +90,19 @@ class Builder extends BaseBuilder
             $this->columns = $columns;
         }
 
+        //Set up custom options
         $options = [];
-        if ($length !== null && (int)$length > 0) {
-            $options['page_size'] = (int) $length;
+        if ($pageSize !== null && (int)$pageSize > 0) {
+            $options['page_size'] = (int) $pageSize;
         }
         if ($nextPageToken !== null) {
             $options['paging_state_token'] = $nextPageToken;
         }
 
+        // Process select with custom options
         $results = $this->processor->processSelect($this, $this->runSelect($options));
 
+        // Get results from all pages
         $collection = [];
         while (true) {
             $collection = array_merge($collection, collect($results)->toArray());
@@ -116,16 +121,18 @@ class Builder extends BaseBuilder
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  int|null  $length
+     * @param  int|null  $pageSize
      * @param  string|null  $nextPageToken
      *
      * @return Collection
+     *
+     * @TODO implement skip / offset
      */
-    public function getPage($length = null, $nextPageToken = null)
+    public function getPage($pageSize = null, $nextPageToken = null)
     {
         $options = [];
-        if ($length !== null && (int)$length > 0) {
-            $options['page_size'] = (int) $length;
+        if ($pageSize !== null && (int)$pageSize > 0) {
+            $options['page_size'] = (int) $pageSize;
         }
         if ($nextPageToken !== null) {
             $options['paging_state_token'] = $nextPageToken;
