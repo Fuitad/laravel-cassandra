@@ -186,9 +186,11 @@ class Connection extends \Illuminate\Database\Connection
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
+     * @param  array  $customOptions
+     *
      * @return array
      */
-    public function select($query, $bindings = [], $useReadPdo = true, $customOptions = [])
+    public function select($query, $bindings = [], $useReadPdo = true, array $customOptions = [])
     {
         return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo, $customOptions) {
             if ($this->pretending()) {

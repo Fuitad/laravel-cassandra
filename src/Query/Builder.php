@@ -9,7 +9,26 @@ use Illuminate\Support\Arr;
 
 class Builder extends BaseBuilder
 {
+    /**
+     * Use cassandra filtering
+     *
+     * @var bool
+     */
     public $allowFiltering = false;
+
+    /**
+     * Size of fetched page
+     *
+     * @var null|int
+     */
+    protected $pageSize = null;
+
+    /**
+     * Pagination state token
+     *
+     * @var null|string
+     */
+    protected $paginationStateToken = null;
 
     /**
      * @inheritdoc
@@ -75,14 +94,12 @@ class Builder extends BaseBuilder
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
-     * @param  int|null  $pageSize
-     * @param  string|null  $nextPageToken
      *
      * @return \Illuminate\Support\Collection
      *
      * @TODO implement skip / offset
      */
-    public function get($columns = ['*'], $pageSize = null, $nextPageToken = null)
+    public function get($columns = ['*'])
     {
         $original = $this->columns;
 
@@ -92,11 +109,11 @@ class Builder extends BaseBuilder
 
         //Set up custom options
         $options = [];
-        if ($pageSize !== null && (int)$pageSize > 0) {
-            $options['page_size'] = (int) $pageSize;
+        if ($this->pageSize !== null && (int)$this->pageSize > 0) {
+            $options['page_size'] = (int)$this->pageSize;
         }
-        if ($nextPageToken !== null) {
-            $options['paging_state_token'] = $nextPageToken;
+        if ($this->paginationStateToken !== null) {
+            $options['paging_state_token'] = $this->paginationStateToken;
         }
 
         // Process select with custom options
@@ -118,40 +135,49 @@ class Builder extends BaseBuilder
     }
 
     /**
-     * Execute the query as a "select" statement.
-     *
-     * @param  int|null  $pageSize
-     * @param  string|null  $nextPageToken
-     *
-     * @return \Cassandra\Rows
-     *
-     * @TODO implement skip / offset
-     */
-    public function getPage($pageSize = null, $nextPageToken = null)
-    {
-        $options = [];
-        if ($pageSize !== null && (int)$pageSize > 0) {
-            $options['page_size'] = (int) $pageSize;
-        }
-        if ($nextPageToken !== null) {
-            $options['paging_state_token'] = $nextPageToken;
-        }
-
-        $results = $this->processor->processSelect($this, $this->runSelect($options));
-
-        return $results;
-    }
-
-    /**
      * Run the query as a "select" statement against the connection.
+     *
+     * @param array $options
      *
      * @return array
      */
-    protected function runSelect($options = [])
+    protected function runSelect(array $options = [])
     {
         return $this->connection->select(
             $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $options
         );
     }
 
+    /**
+     * Set pagination state token to fetch
+     * next page
+     *
+     * @param string $token
+     *
+     * @return Builder
+     */
+    public function setPaginationStateToken($token = null)
+    {
+        $this->paginationStateToken = $token;
+
+        return $this;
+    }
+
+    /**
+     * Set page size
+     *
+     * @param int $pageSize
+     *
+     * @return Builder
+     */
+    public function setPageSize($pageSize = null)
+    {
+        if ($pageSize !== null) {
+            $this->pageSize = (int)$pageSize;
+        } else {
+            $this->pageSize = $pageSize;
+        }
+
+        return $this;
+    }
 }
