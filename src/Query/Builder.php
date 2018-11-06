@@ -31,6 +31,14 @@ class Builder extends BaseBuilder
     protected $paginationStateToken = null;
 
     /**
+     * Indicate what amount of pages should be fetched
+     * all or single
+     *
+     * @var bool
+     */
+    protected $fetchAllResults = true;
+
+    /**
      * @inheritdoc
      */
     public function __construct(Connection $connection, Grammar $grammar = null, Processor $processor = null)
@@ -96,8 +104,6 @@ class Builder extends BaseBuilder
      * @param  array  $columns
      *
      * @return \Illuminate\Support\Collection
-     *
-     * @TODO implement skip / offset
      */
     public function get($columns = ['*'])
     {
@@ -122,12 +128,11 @@ class Builder extends BaseBuilder
         // Get results from all pages
         $collection = new Collection($results);
 
-//TODO:
-//        if (something) {
+        if ($this->fetchAllResults) {
             while (!$collection->isLastPage()) {
                 $collection = $collection->appendNextPage();
             }
-//        }
+        }
 
         $this->columns = $original;
 
@@ -179,5 +184,23 @@ class Builder extends BaseBuilder
         }
 
         return $this;
+    }
+
+    /**
+     * Get collection with single page results
+     *
+     * @param $columns array
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getPage($columns = ['*'])
+    {
+        $this->fetchAllResults = false;
+
+        $result = $this->get($columns);
+
+        $this->fetchAllResults = true;
+
+        return $result;
     }
 }

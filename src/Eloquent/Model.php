@@ -3,7 +3,9 @@
 namespace fuitad\LaravelCassandra\Eloquent;
 
 use Carbon\Carbon;
+use Cassandra\Rows;
 use Cassandra\Timestamp;
+use fuitad\LaravelCassandra\Collection;
 use fuitad\LaravelCassandra\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Support\Str;
@@ -158,6 +160,18 @@ abstract class Model extends BaseModel
         }
 
         return parent::__call($method, $parameters);
+    }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  Rows  $rows
+     *
+     * @return Collection
+     */
+    public function newCassandraCollection(Rows $rows)
+    {
+        return new Collection($rows, $this);
     }
 
 }

@@ -3,6 +3,7 @@
 namespace fuitad\LaravelCassandra;
 
 use Cassandra\Rows;
+use fuitad\LaravelCassandra\Eloquent\Model;
 use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Arrayable;

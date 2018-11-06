@@ -1,8 +1,6 @@
 Laravel Cassandra
 ===============
 
-[![Build Status](https://scrutinizer-ci.com/g/Fuitad/laravel-cassandra/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Fuitad/laravel-cassandra/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Fuitad/laravel-cassandra/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Fuitad/laravel-cassandra/?branch=master) [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/fuitad)
-
 A Cassandra based Eloquent model and Query builder for Laravel (Casloquent)
 
 **WARNING**: This is a work in progress... not ready for usage yet.
@@ -102,11 +100,6 @@ Supported most of eloquent query build features, events, fields access.
     $user = User::find(new \Cassandra\Uuid("7e4c27e2-1991-11e8-accf-0ed5f89f718b"))
 ```
 
-TODO:
-- full support composite primary key
-- add ability to work with views
-- full test coverage
-
 Relations - NOT SUPPORTED
 
 Query Builder
@@ -126,9 +119,98 @@ If you did not change your default database connection, you will need to specify
 $user = DB::connection('cassandra')->table('users')->get();
 ```
 
+Default use of `get` method of query builder will call chunked fetch from database.
+Chunk size can be configured on config file (` 'page_size' => env('DB_PAGE_SIZE', 5000)`) or with additional query builder\`s method `setPageSize`.
+
+```php
+$comments = Comments::setPageSize(500)->get(); // will return all comments, not 500
+```
+
+**WARNING**: Not recomended to use `get` if there are a lot of data in table. Use `getPage` instead.
+
+Get single page of resuts
+```php
+$comments = Comments::setPageSize(500)->getPage(); // will return collection with 500 results
+```
+
+There is an ability to set next page token what allows to get next chunk of results
+```php
+$comments = Comments::setPaginationStateToken($token)->getPage();
+```
+
+Get next page:
+```php
+$comments = $comments->nextPage();
+```
+
+Get next page token:
+```php
+$comments = $comments->getNextPageToken();
+```
+
+Append collection with next page`s result:
+```php
+$comments->appendNextPage();
+```
+
+Check if it is last page:
+```php
+$comments->isLastPage();
+```
+
+Get raw cassandra response for current page (\Cassandra\Rows):
+```php
+$rows = $commants->getRows();
+```
+
 Read more about the query builder on http://laravel.com/docs/queries
 
-Credits
+Examples
 ---------
 
-A lot of the logic behind this package is borrowed from the great [Laravel-MongoDB](https://github.com/jenssegers/) package.
+- store users data to csv
+
+```php
+$users = User::setPageSize(1000)->getPage();
+while(!$users->isLastPage()) {
+    foreach($users as $user) {
+        // here you can write a lines to csv file
+    }
+    
+    $users = $users->nextPage();
+}
+```
+
+- Simple api to make `Load more` as paggination on page
+
+```php
+public function getComments(Request $request) {
+    ...
+    
+    $comments = Comment::setPageSize(50)
+        ->setPaginationStateToken($request->get('nextPageToken', null)
+        ->getPage();
+    
+    ...
+    
+    return response()->json([
+        ...
+        'comments' => $comments,
+        'nextPageToken' => !$comments->isLastPage() ? $comments->getNextPageToken() : null,
+        ...
+    ]);
+}
+```
+
+- If you use cassandra materialized views you can easily use it with eloquent models
+```php
+$users = User::from('users_by_country_view')->where('country', 'USA')->get();
+```
+
+
+TODO:
+-----
+- full support of composite primary key
+- improved model update
+- full test coverage
+- fix diff between \Cassandra\Date with Carbon
