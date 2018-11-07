@@ -41,6 +41,8 @@ class Builder extends EloquentBuilder
      * @param  array  $columns
      *
      * @return Collection
+     *
+     * @throws \Exception
      */
     public function getModelsPage($columns = ['*'])
     {
@@ -48,6 +50,8 @@ class Builder extends EloquentBuilder
 
         if ($results instanceof Collection) {
             $results = $results->getRows();
+        } elseif (!$results instanceof Rows) {
+            throw new \Exception('Invalid type of getPage response. Expected fuitad\LaravelCassandra\Collection or Cassandra\Rows');
         }
 
         return $this->model->hydrateRows($results);
