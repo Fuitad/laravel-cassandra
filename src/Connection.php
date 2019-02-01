@@ -48,16 +48,18 @@ class Connection extends \Illuminate\Database\Connection
         if (empty($this->config['page_size'])) {
             $this->config['page_size'] = self::DEFAULT_PAGE_SIZE;
         }
-        
+
         // You can pass options directly to the Cassandra constructor
         $options = array_get($config, 'options', []);
 
         // Create the connection
         $this->cluster = $this->createCluster(null, $config, $options);
 
-        if (isset($options['database']) || isset($config['database'])) {
-            $this->keyspace = $config['database'];
-            $this->session = $this->cluster->connect($config['database']);
+        if (isset($options['database']) || isset($config['keyspace'])) {
+            $keyspaceName = isset($options['database']) ? $options['database'] : $config['keyspace'];
+
+            $this->keyspace = $keyspaceName;
+            $this->session = $this->cluster->connect($keyspaceName);
         }
 
         $this->useDefaultPostProcessor();
@@ -150,6 +152,10 @@ class Connection extends \Illuminate\Database\Connection
 
             if (isset($options['contactpoints'])) {
                 $contactPoints = $options['contactpoints'];
+            }
+
+            if (!is_array($contactPoints)) {
+                $contactPoints = (array) $contactPoints;
             }
 
             call_user_func_array([$cluster, 'withContactPoints'], $contactPoints);

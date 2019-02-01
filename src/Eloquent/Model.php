@@ -174,4 +174,114 @@ abstract class Model extends BaseModel
         return new Collection($rows, $this);
     }
 
+    /**
+     * Determine if the new and old values for a given key are equivalent.
+     *
+     * @param  string $key
+     * @param  mixed $current
+     * @return bool
+     */
+    protected function originalIsEquivalent($key, $current)
+    {
+        if (!array_key_exists($key, $this->original)) {
+            return false;
+        }
+
+        $original = $this->getOriginal($key);
+
+        if ($current === $original) {
+            return true;
+        } elseif (is_null($current)) {
+            return false;
+        } elseif ($this->isDateAttribute($key)) {
+            return $this->fromDateTime($current) ===
+                $this->fromDateTime($original);
+        } elseif ($this->hasCast($key)) {
+            return $this->castAttribute($key, $current) ===
+                $this->castAttribute($key, $original);
+        } elseif ($this->isCassandraObject($current)) {
+            return $this->valueFromCassandraObject($current) ===
+                $this->valueFromCassandraObject($original);
+        }
+
+        return is_numeric($current) && is_numeric($original)
+            && strcmp((string)$current, (string)$original) === 0;
+    }
+
+    /**
+     * Check if object is instance of any cassandra object types
+     *
+     * @param $obj
+     * @return bool
+     */
+    protected function isCassandraObject($obj)
+    {
+        if ($obj instanceof \Cassandra\Uuid ||
+            $obj instanceof \Cassandra\Date ||
+            $obj instanceof \Cassandra\Float ||
+            $obj instanceof \Cassandra\Decimal ||
+            $obj instanceof \Cassandra\Timestamp ||
+            $obj instanceof \Cassandra\Inet ||
+            $obj instanceof \Cassandra\Time
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check if object is instance of any cassandra object types
+     *
+     * @param $obj
+     * @return bool
+     */
+    protected function isCompareableCassandraObject($obj)
+    {
+        if ($obj instanceof \Cassandra\Uuid ||
+            $obj instanceof \Cassandra\Inet
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns comparable value from cassandra object type
+     *
+     * @param $obj
+     * @return mixed
+     */
+    protected function valueFromCassandraObject($obj)
+    {
+        $class = get_class($obj);
+        $value = '';
+        switch ($class) {
+            case 'Cassandra\Date':
+                $value = $obj->seconds();
+                break;
+            case 'Cassandra\Time':
+                $value = $obj->__toString();
+                break;
+            case 'Cassandra\Timestamp':
+                $value = $obj->time();
+                break;
+            case 'Cassandra\Float':
+                $value = $obj->value();
+                break;
+            case 'Cassandra\Decimal':
+                $value = $obj->value();
+                break;
+            case 'Cassandra\Inet':
+                $value = $obj->address();
+                break;
+            case 'Cassandra\Uuid':
+                $value = $obj->uuid();
+                break;
+        }
+
+        return $value;
+    }
+
 }

@@ -12,6 +12,7 @@ class Builder extends EloquentBuilder
      * Create a collection of models from plain arrays.
      *
      * @param  Rows  $rows
+     *
      * @return Collection
      */
     public function hydrateRows(Rows $rows)
@@ -27,6 +28,8 @@ class Builder extends EloquentBuilder
      * @param  array  $columns
      *
      * @return Collection
+     *
+     * @throws \Exception
      */
     public function getPage($columns = ['*'])
     {
@@ -56,4 +59,40 @@ class Builder extends EloquentBuilder
 
         return $this->model->hydrateRows($results);
     }
+
+    /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function get($columns = ['*'])
+    {
+        $builder = $this->applyScopes();
+
+        return $builder->getModels($columns);
+    }
+
+    /**
+     * Get the hydrated models without eager loading.
+     *
+     * @param  array  $columns
+     *
+     * @return \Illuminate\Database\Eloquent\Model[]|static[]
+     *
+     * @throws \Exception
+     */
+    public function getModels($columns = ['*'])
+    {
+        $results = $this->query->get($columns);
+
+        if ($results instanceof Collection) {
+            $results = $results->getRows();
+        } elseif (!$results instanceof Rows) {
+            throw new \Exception('Invalid type of getPage response. Expected fuitad\LaravelCassandra\Collection or Cassandra\Rows');
+        }
+
+        return $this->model->hydrateRows($results);
+    }
+
 }
