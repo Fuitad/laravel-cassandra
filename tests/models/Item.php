@@ -1,6 +1,6 @@
 <?php
 
-use fuitad\LaravelCassandra\Eloquent\Model as Casloquent;
+use lroman242\LaravelCassandra\Eloquent\Model as Casloquent;
 
 class Item extends Casloquent
 {

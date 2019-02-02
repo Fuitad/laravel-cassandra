@@ -1,9 +1,9 @@
 <?php
 
-namespace fuitad\LaravelCassandra\Query;
+namespace lroman242\LaravelCassandra\Query;
 
-use fuitad\LaravelCassandra\Collection;
-use fuitad\LaravelCassandra\Connection;
+use lroman242\LaravelCassandra\Collection;
+use lroman242\LaravelCassandra\Connection;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Support\Arr;
 

@@ -1,6 +1,6 @@
 <?php
 
-use fuitad\LaravelCassandra\Eloquent\Model as Casloquent;
+use lroman242\LaravelCassandra\Eloquent\Model as Casloquent;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;

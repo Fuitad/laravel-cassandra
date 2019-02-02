@@ -2,7 +2,7 @@
 
 use Carbon\Carbon;
 use Cassandra\Timestamp;
-use fuitad\LaravelCassandra\Eloquent\Model;
+use lroman242\LaravelCassandra\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 
 class ModelTest extends TestCase
@@ -16,7 +16,7 @@ class ModelTest extends TestCase
     {
         $user = new User;
         $this->assertInstanceOf(Model::class, $user);
-        $this->assertInstanceOf('fuitad\LaravelCassandra\Connection', $user->getConnection());
+        $this->assertInstanceOf('lroman242\LaravelCassandra\Connection', $user->getConnection());
         $this->assertEquals(false, $user->exists);
         $this->assertEquals('users', $user->getTable());
         $this->assertEquals('id', $user->getKeyName());

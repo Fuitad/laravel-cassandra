@@ -5,7 +5,7 @@ class ConnectionTest extends TestCase
     public function testConnection()
     {
         $connection = DB::connection('cassandra');
-        $this->assertInstanceOf('fuitad\LaravelCassandra\Connection', $connection);
+        $this->assertInstanceOf('lroman242\LaravelCassandra\Connection', $connection);
     }
 
     public function testReconnect()

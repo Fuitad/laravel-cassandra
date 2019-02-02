@@ -1,9 +1,9 @@
 <?php
 
-namespace fuitad\LaravelCassandra;
+namespace lroman242\LaravelCassandra;
 
 use Cassandra\Rows;
-use fuitad\LaravelCassandra\Eloquent\Model;
+use lroman242\LaravelCassandra\Eloquent\Model;
 use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Arrayable;

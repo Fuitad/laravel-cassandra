@@ -1,6 +1,6 @@
 <?php
 
-namespace fuitad\LaravelCassandra\Query;
+namespace lroman242\LaravelCassandra\Query;
 
 use Illuminate\Database\Query\Processors\Processor as BaseProcessor;
 

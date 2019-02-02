@@ -19,13 +19,13 @@ Make sure you have the Cassandra PHP driver installed (version 1.2+). You can fi
 Installation using composer:
 
 ```
-composer require fuitad/laravel-cassandra
+composer require lroman242/laravel-cassandra
 ```
 #### Laravel
 And add the service provider in `config/app.php`:
 
 ```php
-fuitad\LaravelCassandra\CassandraServiceProvider::class,
+lroman242\LaravelCassandra\CassandraServiceProvider::class,
 ```
 
 The service provider will register a cassandra database extension with the original database manager. There is no need to register additional facades or objects. When using cassandra connections, Laravel will automatically provide you with the corresponding cassandra objects.
@@ -35,7 +35,7 @@ For usage outside Laravel, check out the [Capsule manager](https://github.com/il
 ```php
 $capsule->getDatabaseManager()->extend('cassandra', function($config)
 {
-    return new fuitad\LaravelCassandra\Connection($config);
+    return new lroman242\LaravelCassandra\Connection($config);
 });
 ```
 #### Lumen
@@ -47,7 +47,7 @@ Add next lines to your `bootstrap.php`
 ```
 
 ```php
-    $app->register(fuitad\LaravelCassandra\CassandraServiceProvider::class);
+    $app->register(lroman242\LaravelCassandra\CassandraServiceProvider::class);
 ```
 
 Configuration

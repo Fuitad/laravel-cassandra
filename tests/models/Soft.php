@@ -1,7 +1,7 @@
 <?php
 
-use fuitad\LaravelCassandra\Eloquent\Model as Casloquent;
-use fuitad\LaravelCassandra\Eloquent\SoftDeletes;
+use lroman242\LaravelCassandra\Eloquent\Model as Casloquent;
+use lroman242\LaravelCassandra\Eloquent\SoftDeletes;
 
 class Soft extends Casloquent
 {

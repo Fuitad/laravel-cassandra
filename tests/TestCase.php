@@ -11,8 +11,8 @@ class TestCase extends Orchestra\Testbench\TestCase
     protected function getPackageProviders($app)
     {
         return [
-            fuitad\LaravelCassandra\CassandraServiceProvider::class,
-            //fuitad\LaravelCassandra\Auth\PasswordResetServiceProvider::class,
+            lroman242\LaravelCassandra\CassandraServiceProvider::class,
+            //lroman242\LaravelCassandra\Auth\PasswordResetServiceProvider::class,
         ];
     }
 

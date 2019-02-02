@@ -1,12 +1,12 @@
 <?php
 
-namespace fuitad\LaravelCassandra\Eloquent;
+namespace lroman242\LaravelCassandra\Eloquent;
 
 use Carbon\Carbon;
 use Cassandra\Rows;
 use Cassandra\Timestamp;
-use fuitad\LaravelCassandra\Collection;
-use fuitad\LaravelCassandra\Query\Builder as QueryBuilder;
+use lroman242\LaravelCassandra\Collection;
+use lroman242\LaravelCassandra\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Support\Str;
 
