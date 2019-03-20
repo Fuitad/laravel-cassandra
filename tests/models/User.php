@@ -14,7 +14,7 @@ class User extends Casloquent implements AuthenticatableContract, CanResetPasswo
 
     protected static $unguarded = true;
 
-    protected function getDateFormat()
+    public function getDateFormat()
     {
         return 'l jS \of F Y h:i:s A';
     }

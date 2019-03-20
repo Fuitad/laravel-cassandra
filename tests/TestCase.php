@@ -12,7 +12,6 @@ class TestCase extends Orchestra\Testbench\TestCase
     {
         return [
             lroman242\LaravelCassandra\CassandraServiceProvider::class,
-            //lroman242\LaravelCassandra\Auth\PasswordResetServiceProvider::class,
         ];
     }
 
@@ -24,7 +23,7 @@ class TestCase extends Orchestra\Testbench\TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $config = require 'config/database.php';
+        $config = require(__DIR__ . '/config/database.php');
 
         $app['config']->set('app.key', 'gi0BMtzVEdluo98rjx9aiFWjYtETsj8V');
 

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ModelTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown(): void
     {
         User::truncate();
     }

@@ -14,11 +14,6 @@
     <testsuites>
         <testsuite name="all">
             <directory>tests/</directory>
-            <exclude>tests/MysqlRelationsTest.php</exclude>
-        </testsuite>
-        <testsuite name="builder">
-            <directory>tests/QueryBuilderTest.php</directory>
-            <directory>tests/QueryTest.php</directory>
         </testsuite>
     </testsuites>
 </phpunit>
