@@ -1,7 +1,7 @@
 language: php
 
 php:
-  - 5.6
+  - 7.1
 
 sudo: required
 
@@ -15,14 +15,15 @@ addons:
       - curl
       - cmake
       - g++
-      - libgmp-dev
       - libpcre3-dev
       - libssl-dev
       - make
       - openssl
-      - oracle-java8-set-default
+      - openjdk-8-jre
       - python-dev
       - python-setuptools
+      - php7.1-dev
+      - libgmp-dev
 
 install:
   - bash travis_bootstrap.sh
