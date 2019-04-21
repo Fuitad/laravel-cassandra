@@ -1,8 +1,13 @@
 #!/bin/sh
 set -e
 
-# Install libuv from source since there is no libuv-dev package in Precise
+# Install PHP 7.1-dev
+sudo apt-get install software-properties-common
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt-get update
+sudo apt-get install -y php7.1-dev
 
+# Install libuv from source since there is no libuv-dev package in Precise
 #curl -sSL https://github.com/libuv/libuv/archive/v1.24.0.tar.gz | sudo tar zxfv - -C /usr/local/src
 #cd /usr/local/src/libuv-1.24.0
 #sudo sh autogen.sh
@@ -22,7 +27,7 @@ sudo dpkg -i cassandra-cpp-driver_2.11.0-1_amd64.deb
 sudo dpkg -i cassandra-cpp-driver_2.11.0-1_amd64.deb
 
 # Stop if already exists
-sudo service cassandra stop
+#sudo service cassandra stop
 # Stop remove configs
 sudo rm -rf /var/lib/cassandra/* /etc/init.d/cassandra /etc/security/limits.d/cassandra.conf
 # Install Apache Cassandra
