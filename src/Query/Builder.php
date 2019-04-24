@@ -115,8 +115,8 @@ class Builder extends BaseBuilder
 
         //Set up custom options
         $options = [];
-        if ($this->pageSize !== null && (int)$this->pageSize > 0) {
-            $options['page_size'] = (int)$this->pageSize;
+        if ($this->pageSize !== null && (int) $this->pageSize > 0) {
+            $options['page_size'] = (int) $this->pageSize;
         }
         if ($this->paginationStateToken !== null) {
             $options['paging_state_token'] = $this->paginationStateToken;
@@ -149,7 +149,7 @@ class Builder extends BaseBuilder
     protected function runSelect(array $options = [])
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $options
+            $this->toSql(), $this->getBindings(), !$this->useWritePdo, $options
         );
     }
 
@@ -178,7 +178,7 @@ class Builder extends BaseBuilder
     public function setPageSize($pageSize = null)
     {
         if ($pageSize !== null) {
-            $this->pageSize = (int)$pageSize;
+            $this->pageSize = (int) $pageSize;
         } else {
             $this->pageSize = $pageSize;
         }

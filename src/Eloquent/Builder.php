@@ -63,8 +63,11 @@ class Builder extends EloquentBuilder
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @param array $columns
+     *
+     * @return EloquentBuilder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model[]|Builder[]
+     *
+     * @throws \Exception
      */
     public function get($columns = ['*'])
     {

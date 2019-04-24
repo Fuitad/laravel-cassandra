@@ -206,7 +206,7 @@ class Connection extends \Illuminate\Database\Connection
             $preparedStatement = $this->session->prepare($query);
 
             //Set default page size
-            $defaultOptions = ['page_size' => (int)$this->config['page_size']];
+            $defaultOptions = ['page_size' => (int) $this->config['page_size']];
 
             //Merge with custom options
             $options = array_merge($defaultOptions, $customOptions);

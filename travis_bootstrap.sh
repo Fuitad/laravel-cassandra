@@ -28,7 +28,4 @@ sudo service cassandra start
 
 pecl install cassandra
 
-#sudo easy_install pip
-#sudo pip install cqlsh
-
 /usr/bin/cqlsh -f $TRAVIS_BUILD_DIR/setup_cassandra_unittest_keyspace.cql

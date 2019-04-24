@@ -113,7 +113,7 @@ coding_style:
 build:
     environment:
         php:
-            version: '5.6'
+            version: '7.1'
         java: java-8-oracle
         postgresql: false
         mongodb: false
@@ -125,18 +125,29 @@ build:
 
     dependencies:
         before:
-            - sudo apt-get install -y g++ make cmake libuv-dev libssl-dev libgmp-dev php5 php5-dev openssl libpcre3-dev python-setuptools python-dev build-essential 
-            - echo "deb http://www.apache.org/dist/cassandra/debian 30x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
-            - echo "deb-src http://www.apache.org/dist/cassandra/debian 30x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+            - sudo apt-get install -y software-properties-common
+            - sudo add-apt-repository ppa:ondrej/php -y
+            - sudo apt-get update
+            - sudo apt-get install -y php7.1-dev ntp
+            - sudo apt-get install -y libstdc++6 build-essential curl cmake g++ libpcre3-dev libssl-dev make openssl openjdk-8-jre python-dev python-setuptools libgmp-dev
+#            - sudo apt-get install -y libssl1.0.0=1.0.2r
+#            - sudo apt-get install -y libstdc++6=5
+            - cd /tmp && wget http://downloads.datastax.com/cpp-driver/ubuntu/14.04/dependencies/libuv/v1.28.0/libuv1_1.28.0-1_amd64.deb && wget http://downloads.datastax.com/cpp-driver/ubuntu/14.04/dependencies/libuv/v1.28.0/libuv1-dev_1.28.0-1_amd64.deb
+            - sudo dpkg -i libuv1_1.28.0-1_amd64.deb
+            - sudo dpkg -i libuv1-dev_1.28.0-1_amd64.deb
+            - cd /tmp && wget http://downloads.datastax.com/cpp-driver/ubuntu/14.04/cassandra/v2.12.0/cassandra-cpp-driver_2.12.0-1_amd64.deb && wget http://downloads.datastax.com/cpp-driver/ubuntu/14.04/cassandra/v2.12.0/cassandra-cpp-driver-dev_2.12.0-1_amd64.deb
+            - sudo dpkg -i cassandra-cpp-driver_2.12.0-1_amd64.deb
+            - sudo dpkg -i cassandra-cpp-driver-dev_2.12.0-1_amd64.deb
+            - sudo apt-get clean
+            - sudo apt-get update
+            - sudo apt-get install dpkg
+            - sudo rm -rf /var/lib/cassandra/* /etc/init.d/cassandra /etc/security/limits.d/cassandra.conf
+            - echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
             - curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
-            - sudo apt-get update && sudo apt-get install -y cassandra
-            - cd /tmp && git clone https://github.com/datastax/cpp-driver.git && cd cpp-driver && git checkout 76656844bd13be1dbccbdb69dad93c2e9514e21f `#Version 2.6.0` && mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr .. && make && sudo make install
-            - sudo easy_install pip
-            - pip install cqlsh
-            - /usr/bin/cqlsh -f /home/scrutinizer/build/setup_cassandra_unittest_keyspace.cql
+            - sudo apt-get update && sudo apt-get install -y cassandra && service cassandra start && pip install cqlsh && /usr/bin/cqlsh -f /home/scrutinizer/build/setup_cassandra_unittest_keyspace.cql
 
         override:
-            - yes | pecl install cassandra-1.2.2
+            - yes | pecl install cassandra
             - cd /home/scrutinizer/build/ && composer install --no-interaction
         
     cache:

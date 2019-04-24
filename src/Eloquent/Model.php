@@ -121,7 +121,7 @@ abstract class Model extends BaseModel
         // which simply lets the developers tweak the attribute as it is set on
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key)) {
-            $method = 'set'.Str::studly($key).'Attribute';
+            $method = 'set' . Str::studly($key) . 'Attribute';
 
             return $this->{$method}($value);
         }
@@ -133,7 +133,7 @@ abstract class Model extends BaseModel
             $value = $this->fromDateTime($value);
         }
 
-        if ($this->isJsonCastable($key) && ! is_null($value)) {
+        if ($this->isJsonCastable($key) && !is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
         }
 
@@ -205,7 +205,7 @@ abstract class Model extends BaseModel
         }
 
         return is_numeric($current) && is_numeric($original)
-            && strcmp((string)$current, (string)$original) === 0;
+            && strcmp((string) $current, (string) $original) === 0;
     }
 
     /**

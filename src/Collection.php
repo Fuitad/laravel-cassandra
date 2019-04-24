@@ -4,7 +4,6 @@ namespace lroman242\LaravelCassandra;
 
 use Cassandra\Rows;
 use lroman242\LaravelCassandra\Eloquent\Model;
-use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Collection as BaseCollection;
@@ -163,7 +162,7 @@ class Collection extends BaseCollection
         $dictionary = $this->getDictionary();
 
         foreach ($items as $item) {
-            $dictionary[(string)$item->getKey()] = $item;
+            $dictionary[(string) $item->getKey()] = $item;
         }
 
         return new static(array_values($dictionary), $this->model);
@@ -190,8 +189,8 @@ class Collection extends BaseCollection
             ->getDictionary();
 
         return $this->map(function ($model) use ($freshModels) {
-            return $model->exists && isset($freshModels[(string)$model->getKey()])
-                ? $freshModels[(string)$model->getKey()] : null;
+            return $model->exists && isset($freshModels[(string) $model->getKey()])
+                ? $freshModels[(string) $model->getKey()] : null;
         });
     }
 
@@ -208,7 +207,7 @@ class Collection extends BaseCollection
         $dictionary = $this->getDictionary($items);
 
         foreach ($this->items as $item) {
-            if (! isset($dictionary[(string)$item->getKey()])) {
+            if (!isset($dictionary[(string) $item->getKey()])) {
                 $diff->add($item);
             }
         }
@@ -229,7 +228,7 @@ class Collection extends BaseCollection
         $dictionary = $this->getDictionary($items);
 
         foreach ($this->items as $item) {
-            if (isset($dictionary[(string)$item->getKey()])) {
+            if (isset($dictionary[(string) $item->getKey()])) {
                 $intersect->add($item);
             }
         }
@@ -246,7 +245,7 @@ class Collection extends BaseCollection
      */
     public function unique($key = null, $strict = false)
     {
-        if (! is_null($key)) {
+        if (!is_null($key)) {
             return parent::unique($key, $strict);
         }
 
@@ -297,7 +296,7 @@ class Collection extends BaseCollection
         $dictionary = [];
 
         foreach ($items as $value) {
-            $dictionary[(string)$value->getKey()] = $value;
+            $dictionary[(string) $value->getKey()] = $value;
         }
 
         return $dictionary;
