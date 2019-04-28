@@ -146,15 +146,42 @@ class Connection extends \Illuminate\Database\Connection
                 $contactPoints = $options['contactpoints'];
             }
 
-            if (!is_array($contactPoints)) {
-                $contactPoints = (array) $contactPoints;
+            if (is_array($contactPoints)) {
+                $contactPoints = implode(',', $contactPoints);
             }
 
-            call_user_func_array([$cluster, 'withContactPoints'], $contactPoints);
+            $contactPoints = !empty($contactPoints) ? $contactPoints : '127.0.0.1';
+
+            $cluster->withContactPoints($contactPoints);
         }
 
         if (!isset($options['port']) && !empty($config['port'])) {
             $cluster->withPort((int) $config['port']);
+        }
+
+        if (array_key_exists('page_size', $config) && !empty($config['page_size'])) {
+            $cluster->withDefaultPageSize(intval($config['page_size'] ?? self::DEFAULT_PAGE_SIZE));
+        }
+
+        if (array_key_exists('consistency', $config) && in_array(strtoupper($config['consistency']), [
+                Cassandra::CONSISTENCY_ANY, Cassandra::CONSISTENCY_ONE, Cassandra::CONSISTENCY_TWO,
+                Cassandra::CONSISTENCY_THREE, Cassandra::CONSISTENCY_QUORUM, Cassandra::CONSISTENCY_ALL,
+                Cassandra::CONSISTENCY_SERIAL, Cassandra::CONSISTENCY_QUORUM, Cassandra::CONSISTENCY_LOCAL_QUORUM,
+                Cassandra::CONSISTENCY_EACH_QUORUM, Cassandra::CONSISTENCY_LOCAL_SERIAL, Cassandra::CONSISTENCY_LOCAL_ONE,
+            ])) {
+            $cluster->withDefaultConsistency($config['consistency']);
+        }
+
+        if (array_key_exists('timeout', $config) && !empty($config['timeout'])) {
+            $cluster->withDefaultTimeout(intval($config['timeout']));
+        }
+
+        if (array_key_exists('connect_timeout', $config) && !empty($config['connect_timeout'])) {
+            $cluster->withConnectTimeout(floatval($config['connect_timeout']));
+        }
+
+        if (array_key_exists('request_timeout', $config) && !empty($config['request_timeout'])) {
+            $cluster->withRequestTimeout(floatval($config['request_timeout']));
         }
 
         return $cluster->build();
@@ -197,16 +224,10 @@ class Connection extends \Illuminate\Database\Connection
 
             $preparedStatement = $this->session->prepare($query);
 
-            //Set default page size
-            $defaultOptions = ['page_size' => (int) $this->config['page_size']];
-
-            //Merge with custom options
-            $options = array_merge($defaultOptions, $customOptions);
-
             //Add bindings
-            $options['arguments'] = $bindings;
+            $customOptions['arguments'] = $bindings;
 
-            return $this->session->execute($preparedStatement, $options);
+            return $this->session->execute($preparedStatement, $customOptions);
         });
     }
 
@@ -215,11 +236,14 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @param  array  $queries
      * @param  array  $bindings
+     * @param  int  $type
+     * @param  array  $customOptions
+     *
      * @return bool
      */
-    public function insertBulk($queries = [], $bindings = [], $type = Cassandra::BATCH_LOGGED)
+    public function insertBulk($queries = [], $bindings = [], $type = Cassandra::BATCH_LOGGED, array $customOptions = [])
     {
-        return $this->batchStatement($queries, $bindings, $type);
+        return $this->batchStatement($queries, $bindings, $type, $customOptions);
     }
 
     /**
@@ -227,11 +251,14 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @param  array  $queries
      * @param  array  $bindings
+     * @param  int  $type
+     * @param  array  $customOptions
+     *
      * @return bool
      */
-    public function batchStatement($queries = [], $bindings = [], $type = Cassandra::BATCH_LOGGED)
+    public function batchStatement($queries = [], $bindings = [], $type = Cassandra::BATCH_LOGGED, array $customOptions = [])
     {
-        return $this->run($queries, $bindings, function ($queries, $bindings) use ($type) {
+        return $this->run($queries, $bindings, function ($queries, $bindings) use ($type, $customOptions) {
             if ($this->pretending()) {
                 return [];
             }
@@ -243,7 +270,7 @@ class Connection extends \Illuminate\Database\Connection
                 $batch->add($preparedStatement, $bindings[$k]);
             }
 
-            return $this->session->execute($batch);
+            return $this->session->execute($batch, $customOptions);
         });
     }
 
@@ -252,18 +279,24 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @param  string  $query
      * @param  array   $bindings
+     * @param  array  $customOptions
+     *
      * @return bool
      */
-    public function statement($query, $bindings = [])
+    public function statement($query, $bindings = [], array $customOptions = [])
     {
-        return $this->run($query, $bindings, function ($query, $bindings) {
+        return $this->run($query, $bindings, function ($query, $bindings) use ($customOptions) {
             if ($this->pretending()) {
                 return [];
             }
 
             $preparedStatement = $this->session->prepare($query);
+            //$this->recordsHaveBeenModified();
 
-            return $this->session->execute($preparedStatement, ['arguments' => $bindings]);
+            //Add bindings
+            $customOptions['arguments'] = $bindings;
+
+            return $this->session->execute($preparedStatement, $customOptions);
         });
     }
 
@@ -274,9 +307,11 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @param  string  $query
      * @param  array   $bindings
+     * @param  array  $customOptions
+     *
      * @return int
      */
-    public function affectingStatement($query, $bindings = [])
+    public function affectingStatement($query, $bindings = [], array $customOptions = [])
     {
         return $this->run($query, $bindings, function ($query, $bindings) {
             if ($this->pretending()) {
@@ -284,8 +319,12 @@ class Connection extends \Illuminate\Database\Connection
             }
 
             $preparedStatement = $this->session->prepare($query);
+            //$this->recordsHaveBeenModified();
 
-            $this->session->execute($preparedStatement, ['arguments' => $bindings]);
+            //Add bindings
+            $customOptions['arguments'] = $bindings;
+
+            $this->session->execute($preparedStatement, $customOptions);
 
             return 1;
         });
@@ -313,6 +352,18 @@ class Connection extends \Illuminate\Database\Connection
     protected function getDefaultSchemaGrammar()
     {
         //return new Schema\Grammar();
+    }
+
+    /**
+     * Reconnect to the database if connection is missing.
+     *
+     * @return void
+     */
+    protected function reconnectIfMissingConnection()
+    {
+        if (is_null($this->session)) {
+            $this->session = $this->createCluster($this->config, [])->connect($this->keyspace);
+        }
     }
 
     /**

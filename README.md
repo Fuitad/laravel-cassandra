@@ -63,13 +63,17 @@ And add a new cassandra connection:
 
 ```php
 'cassandra' => [
-    'driver'    => 'cassandra',
-    'host'      => env('DB_HOST', 'localhost'),
-    'port'      => env('DB_PORT', 9042),
-    'keyspace'  => env('DB_DATABASE'),
-    'username'  => env('DB_USERNAME'),
-    'password'  => env('DB_PASSWORD'),
-    'page_size' => env('DB_PAGE_SIZE', 5000),
+    'driver'          => 'cassandra',
+    'host'            => env('DB_HOST', 'localhost'),
+    'port'            => env('DB_PORT', 9042),
+    'keyspace'        => env('DB_DATABASE'),
+    'username'        => env('DB_USERNAME'),
+    'password'        => env('DB_PASSWORD'),
+    'page_size'       => env('DB_PAGE_SIZE', 5000),
+    'consistency'     => Cassandra::CONSISTENCY_LOCAL_ONE,
+    'timeout'         => null,
+    'connect_timeout' => 5.0,
+    'request_timeout' => 12.0,
 ],
 ```
 
@@ -77,16 +81,41 @@ You can connect to multiple servers with the following configuration:
 
 ```php
 'cassandra' => [
-    'driver'    => 'cassandra',
-    'host'      => ['server1', 'server2'],
-    'port'      => env('DB_PORT', 9042),
-    'keyspace'  => env('DB_DATABASE'),
-    'username'  => env('DB_USERNAME'),
-    'password'  => env('DB_PASSWORD'),
-    'page_size' => env('DB_PAGE_SIZE', 5000),
+    'driver'          => 'cassandra',
+    'host'            => ['192.168.0.1', '192.168.0.2'], //or '192.168.0.1,192.168.0.2'
+    'port'            => env('DB_PORT', 9042),
+    'keyspace'        => env('DB_DATABASE'),
+    'username'        => env('DB_USERNAME'),
+    'password'        => env('DB_PASSWORD'),
+    'page_size'       => env('DB_PAGE_SIZE', 5000),
+    'consistency'     => Cassandra::CONSISTENCY_LOCAL_ONE,
+    'timeout'         => null,
+    'connect_timeout' => 5.0,
+    'request_timeout' => 12.0,
 ],
 ```
+Note: you can enter all of your nodes in .env like :
 
+
+    # .env
+    DB_HOST=192.168.0.1,192.168.0.2,192.168.0.3
+
+Note: list of available consistency levels (php constants):
+
+    Cassandra::CONSISTENCY_ANY
+    Cassandra::CONSISTENCY_ONE
+    Cassandra::CONSISTENCY_TWO
+    Cassandra::CONSISTENCY_THREE
+    Cassandra::CONSISTENCY_QUORUM
+    Cassandra::CONSISTENCY_ALL
+    Cassandra::CONSISTENCY_SERIAL
+    Cassandra::CONSISTENCY_QUORUM
+    Cassandra::CONSISTENCY_LOCAL_QUORUM
+    Cassandra::CONSISTENCY_EACH_QUORUM
+    Cassandra::CONSISTENCY_LOCAL_SERIAL
+    Cassandra::CONSISTENCY_LOCAL_ONE
+    
+Note: you can set specific consistency level according to the query using options
 
 Eloquent
 --------
