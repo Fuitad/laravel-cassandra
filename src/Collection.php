@@ -2,7 +2,7 @@
 
 namespace lroman242\LaravelCassandra;
 
-use Cassandra\Rows;
+use \Cassandra\Rows;
 use lroman242\LaravelCassandra\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Arrayable;
@@ -29,12 +29,10 @@ class Collection extends BaseCollection
      *
      * @param  mixed  $items
      * @param  Model  $model
-     *
-     * @return void
      */
     public function __construct($items = [], Model $model = null)
     {
-        if ($items instanceof \Cassandra\Rows) {
+        if ($items instanceof Rows) {
             $this->rows = $items;
         }
         $this->model = $model;
@@ -45,11 +43,11 @@ class Collection extends BaseCollection
     /**
      * Prepare items for collection
      *
-     * @return Rows|Model[]
+     * @return array|Model[]
      */
     protected function prepareItems($items)
     {
-        if ($this->model !== null && $items instanceof \Cassandra\Rows) {
+        if ($this->model !== null && $items instanceof Rows) {
             $models = [];
 
             foreach ($items as $row) {

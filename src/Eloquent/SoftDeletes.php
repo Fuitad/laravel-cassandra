@@ -12,11 +12,13 @@ trait SoftDeletes
      * Boot the soft deleting trait for a model.
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public static function bootSoftDeletes()
     {
         throw new Exception('Not implemented');
-        static::addGlobalScope(new SoftDeletingScope);
+//        static::addGlobalScope(new SoftDeletingScope);
     }
 
     /**

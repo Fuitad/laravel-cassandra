@@ -11,7 +11,7 @@ class Builder extends EloquentBuilder
     /**
      * Create a collection of models from plain arrays.
      *
-     * @param  Rows  $rows
+     * @param  \Cassandra\Rows  $rows
      *
      * @return Collection
      */
@@ -65,7 +65,7 @@ class Builder extends EloquentBuilder
      *
      * @param array $columns
      *
-     * @return EloquentBuilder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model[]|Builder[]
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      *
      * @throws \Exception
      */
@@ -81,7 +81,7 @@ class Builder extends EloquentBuilder
      *
      * @param  array  $columns
      *
-     * @return \Illuminate\Database\Eloquent\Model[]|static[]
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      *
      * @throws \Exception
      */

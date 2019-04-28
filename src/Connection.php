@@ -53,7 +53,7 @@ class Connection extends \Illuminate\Database\Connection
         $options = array_get($config, 'options', []);
 
         // Create the connection
-        $this->cluster = $this->createCluster(null, $config, $options);
+        $this->cluster = $this->createCluster($config, $options);
 
         if (isset($options['database']) || isset($config['keyspace'])) {
             $keyspaceName = isset($options['database']) ? $options['database'] : $config['keyspace'];
@@ -117,20 +117,12 @@ class Connection extends \Illuminate\Database\Connection
     /**
      * Create a new Cassandra cluster object.
      *
-     * @param  string  $dsn
      * @param  array   $config
      * @param  array   $options
      * @return \Cassandra\Cluster
      */
-    protected function createCluster($dsn, array $config, array $options)
+    protected function createCluster(array $config, array $options)
     {
-        // By default driver options is an empty array.
-        $driverOptions = [];
-
-        if (isset($config['driver_options']) && is_array($config['driver_options'])) {
-            $driverOptions = $config['driver_options'];
-        }
-
         $cluster = Cassandra::cluster();
 
         // Check if the credentials are not already set in the options
@@ -239,12 +231,12 @@ class Connection extends \Illuminate\Database\Connection
      */
     public function batchStatement($queries = [], $bindings = [], $type = Cassandra::BATCH_LOGGED)
     {
-        return $this->run($queries, $bindings, function ($queries, $bindings) {
+        return $this->run($queries, $bindings, function ($queries, $bindings) use ($type) {
             if ($this->pretending()) {
                 return [];
             }
 
-            $batch = new BatchStatement(Cassandra::BATCH_LOGGED);
+            $batch = new BatchStatement($type);
 
             foreach ($queries as $k => $query) {
                 $preparedStatement = $this->session->prepare($query);

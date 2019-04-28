@@ -57,7 +57,7 @@ abstract class Model extends BaseModel
         }
 
         // Let Eloquent convert the value to a DateTime instance.
-        if (!$value instanceof DateTime) {
+        if (!$value instanceof \DateTime) {
             $value = parent::asDateTime($value);
         }
 
