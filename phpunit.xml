@@ -21,4 +21,11 @@
             <directory>tests/QueryTest.php</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory>tests/config</directory>
+            <directory>tests/models</directory>
+            <directory>./fake</directory>
+        </whitelist>
+    </filter>
 </phpunit>

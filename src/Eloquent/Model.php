@@ -1,11 +1,14 @@
 <?php
 
-namespace fuitad\LaravelCassandra\Eloquent;
+namespace lroman242\LaravelCassandra\Eloquent;
 
 use Carbon\Carbon;
+use Cassandra\Rows;
 use Cassandra\Timestamp;
-use fuitad\LaravelCassandra\Query\Builder as QueryBuilder;
+use lroman242\LaravelCassandra\Collection;
+use lroman242\LaravelCassandra\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Model as BaseModel;
+use Illuminate\Support\Str;
 
 abstract class Model extends BaseModel
 {
@@ -32,7 +35,7 @@ abstract class Model extends BaseModel
     {
         $connection = $this->getConnection();
 
-        return new QueryBuilder($connection, $connection->getPostProcessor());
+        return new QueryBuilder($connection, null, $connection->getPostProcessor());
     }
 
     /**
@@ -54,7 +57,7 @@ abstract class Model extends BaseModel
         }
 
         // Let Eloquent convert the value to a DateTime instance.
-        if (!$value instanceof DateTime) {
+        if (!$value instanceof \DateTime) {
             $value = parent::asDateTime($value);
         }
 
@@ -105,6 +108,47 @@ abstract class Model extends BaseModel
         return $this->getKeyName();
     }
 
+     /**
+     * Set a given attribute on the model.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setAttribute($key, $value)
+    {
+        // First we will check for the presence of a mutator for the set operation
+        // which simply lets the developers tweak the attribute as it is set on
+        // the model, such as "json_encoding" an listing of data for storage.
+        if ($this->hasSetMutator($key)) {
+            $method = 'set' . Str::studly($key) . 'Attribute';
+
+            return $this->{$method}($value);
+        }
+
+        // If an attribute is listed as a "date", we'll convert it from a DateTime
+        // instance into a form proper for storage on the database tables using
+        // the connection grammar's date format. We will auto set the values.
+        elseif ($value !== null && $this->isDateAttribute($key)) {
+            $value = $this->fromDateTime($value);
+        }
+
+        if ($this->isJsonCastable($key) && !is_null($value)) {
+            $value = $this->castAttributeAsJson($key, $value);
+        }
+
+        // If this attribute contains a JSON ->, we'll set the proper value in the
+        // attribute's underlying array. This takes care of properly nesting an
+        // attribute in the array's value in the case of deeply nested items.
+        if (Str::contains($key, '->')) {
+            return $this->fillJsonAttribute($key, $value);
+        }
+
+        $this->attributes[$key] = $value;
+
+        return $this;
+    }
+    
     /**
      * @inheritdoc
      */
@@ -117,4 +161,127 @@ abstract class Model extends BaseModel
 
         return parent::__call($method, $parameters);
     }
+
+    /**
+     * Create a new Eloquent Collection instance.
+     *
+     * @param  Rows  $rows
+     *
+     * @return Collection
+     */
+    public function newCassandraCollection(Rows $rows)
+    {
+        return new Collection($rows, $this);
+    }
+
+    /**
+     * Determine if the new and old values for a given key are equivalent.
+     *
+     * @param  string $key
+     * @param  mixed $current
+     * @return bool
+     */
+    public function originalIsEquivalent($key, $current)
+    {
+        if (!array_key_exists($key, $this->original)) {
+            return false;
+        }
+
+        $original = $this->getOriginal($key);
+
+        if ($current === $original) {
+            return true;
+        } elseif (is_null($current)) {
+            return false;
+        } elseif ($this->isDateAttribute($key)) {
+            return $this->fromDateTime($current) ===
+                $this->fromDateTime($original);
+        } elseif ($this->hasCast($key)) {
+            return $this->castAttribute($key, $current) ===
+                $this->castAttribute($key, $original);
+        } elseif ($this->isCassandraObject($current)) {
+            return $this->valueFromCassandraObject($current) ===
+                $this->valueFromCassandraObject($original);
+        }
+
+        return is_numeric($current) && is_numeric($original)
+            && strcmp((string) $current, (string) $original) === 0;
+    }
+
+    /**
+     * Check if object is instance of any cassandra object types
+     *
+     * @param $obj
+     * @return bool
+     */
+    protected function isCassandraObject($obj)
+    {
+        if ($obj instanceof \Cassandra\Uuid ||
+            $obj instanceof \Cassandra\Date ||
+            $obj instanceof \Cassandra\Float ||
+            $obj instanceof \Cassandra\Decimal ||
+            $obj instanceof \Cassandra\Timestamp ||
+            $obj instanceof \Cassandra\Inet ||
+            $obj instanceof \Cassandra\Time
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check if object is instance of any cassandra object types
+     *
+     * @param $obj
+     * @return bool
+     */
+    protected function isCompareableCassandraObject($obj)
+    {
+        if ($obj instanceof \Cassandra\Uuid ||
+            $obj instanceof \Cassandra\Inet
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns comparable value from cassandra object type
+     *
+     * @param $obj
+     * @return mixed
+     */
+    protected function valueFromCassandraObject($obj)
+    {
+        $class = get_class($obj);
+        $value = '';
+        switch ($class) {
+            case 'Cassandra\Date':
+                $value = $obj->seconds();
+                break;
+            case 'Cassandra\Time':
+                $value = $obj->__toString();
+                break;
+            case 'Cassandra\Timestamp':
+                $value = $obj->time();
+                break;
+            case 'Cassandra\Float':
+                $value = $obj->value();
+                break;
+            case 'Cassandra\Decimal':
+                $value = $obj->value();
+                break;
+            case 'Cassandra\Inet':
+                $value = $obj->address();
+                break;
+            case 'Cassandra\Uuid':
+                $value = $obj->uuid();
+                break;
+        }
+
+        return $value;
+    }
+
 }
